@@ -9,6 +9,33 @@
 #define MODULE_NAME_LENGTH 12
 #endif // MODULE_NAME_LENGTH
 
+#define LOG_DEBUG4       0x0001
+#define LOG_DEBUG3       0x0002
+#define LOG_DEBUG2       0x0004
+#define LOG_DEBUG1       0x0008
+
+#define LOG_INFO4        0x0010
+#define LOG_INFO3        0x0020
+#define LOG_INFO2        0x0040
+#define LOG_INFO1        0x0080
+
+#define LOG_WARN4        0x0100
+#define LOG_WARN3        0x0200
+#define LOG_WARN2        0x0400
+#define LOG_WARN1        0x0800
+
+#define LOG_ERR4         0x1000
+#define LOG_ERR3         0x2000
+#define LOG_ERR2         0x4000
+#define LOG_ERR1         0x8000
+
+#define LOG_LEVEL_DEBUG  0xFFFF
+#define LOG_LEVEL_INFO   0xFFF0
+#define LOG_LEVEL_WARN   0xFF00
+#define LOG_LEVEL_ERR    0xF000
+
+#define LOG_LEVEL_ASSERT LOG_ERR4
+
 #define LOG_MASK_DEBUG   0x000F
 #define LOG_MASK_INFO    0x00F0
 #define LOG_MASK_WARN    0x0F00
