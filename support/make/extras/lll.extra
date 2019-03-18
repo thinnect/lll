@@ -1,0 +1,46 @@
+#
+# TinyOS extra to include all the stuff in this repository.
+# @author Raido Pahtma
+# @license MIT
+#
+
+LLL_MAKEFILE_LOCATION := $(patsubst %/,%,$(dir $(abspath $(lastword $(MAKEFILE_LIST)))))
+
+BASE_LOG_LEVEL ?= 0
+ifneq ($(BASE_LOG_LEVEL),0)
+    PFLAGS += -DBASE_LOG_LEVEL=$(BASE_LOG_LEVEL)
+
+    PRINTF_PORT ?= 0
+    ifdef PRINTF_PORT
+        PFLAGS += -DPRINTF_PORT=$(PRINTF_PORT)
+    endif
+
+    MODULE_NAME_LENGTH ?= 8
+    ifdef MODULE_NAME_LENGTH
+        PFLAGS += -DMODULE_NAME_LENGTH=$(MODULE_NAME_LENGTH)
+    endif
+
+    PRINTF_BUFFER_SIZE ?= 255
+    ifdef PRINTF_BUFFER_SIZE
+        PFLAGS += -DPRINTF_BUFFER_SIZE=$(PRINTF_BUFFER_SIZE)
+    endif
+
+    PFLAGS += -I$(LLL_MAKEFILE_LOCATION)/../../../logging
+
+    ifneq ($(filter sim,$(MAKECMDGOALS)),)
+        PFLAGS += $(LLL_MAKEFILE_LOCATION)/../../../logging/loggers_sim.c
+        PFLAGS += $(LLL_MAKEFILE_LOCATION)/../../../logging/loggers_msg_sim.c
+    else ifneq ($(filter container_arm,$(MAKECMDGOALS)),)
+        # nothing
+    else ifneq ($(filter container_pc,$(MAKECMDGOALS)),)
+        # nothing
+    else ifneq ($(filter pc,$(MAKECMDGOALS)),)
+        PFLAGS += $(LLL_MAKEFILE_LOCATION)/../../../logging/loggers_std.c
+        PFLAGS += $(LLL_MAKEFILE_LOCATION)/../../../logging/loggers_msg_std.c
+    else
+        PFLAGS += $(LLL_MAKEFILE_LOCATION)/../../../logging/loggers_hw.c
+        PFLAGS += $(LLL_MAKEFILE_LOCATION)/../../../logging/loggers_msg_hw.c
+    endif
+else
+    PFLAGS += -DBASE_LOG_LEVEL=0x0000
+endif
