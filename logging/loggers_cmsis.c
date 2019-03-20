@@ -12,6 +12,8 @@
 
 #include "__loggers.h"
 
+extern int fileno(FILE *);
+extern int _write(int file, const char *ptr, int len);
 static int(*log_puts)(const char *);
 static uint16_t log_level;
 osMutexId_t log_mutex;
@@ -25,7 +27,7 @@ void log_init(int(*puts)(const char *)){
 	log_mutex = osMutexNew(NULL);
 }
 
-
+/*
 void log(uint16_t severity, char *moduul, uint16_t __line__, char *fmt, ...){
 	char buffer[256];
 	va_list arg;
@@ -36,13 +38,13 @@ void log(uint16_t severity, char *moduul, uint16_t __line__, char *fmt, ...){
 	va_start(arg, fmt);
 	l += vsnprintf(&buffer[l], (256 - l), fmt, arg);
 	va_end(arg);
-	if(l && (buffer[l - 1] == '\n'))buffer[l - 1] = 0;
+	//if(l && (buffer[l - 1] == '\n'))buffer[l - 1] = 0;
 	buffer[255] = 0;
 	while(osMutexAcquire(log_mutex, 1000) != osOK);
-	log_puts(buffer);
+	_write(fileno(stdout), buffer, l);
 	osMutexRelease(log_mutex);
 }
-
+*/
 
 void __logger(uint16_t severity, const char *moduul, uint16_t __line__, const char *fmt, ...) {
 	char buffer[256];
@@ -54,10 +56,11 @@ void __logger(uint16_t severity, const char *moduul, uint16_t __line__, const ch
 	va_start(arg, fmt);
 	l += vsnprintf(&buffer[l], (256 - l), fmt, arg);
 	va_end(arg);
-	if(l && (buffer[l - 1] == '\n'))buffer[l - 1] = 0;
+	//if(l && (buffer[l - 1] == '\n'))buffer[l - 1] = 0;
+	buffer[l] = '\n';
 	buffer[255] = 0;
 	while(osMutexAcquire(log_mutex, 1000) != osOK);
-	log_puts(buffer);
+	_write(fileno(stdout), buffer, l+1);
 	osMutexRelease(log_mutex);
 }
 
@@ -72,10 +75,10 @@ void __loggerb(uint16_t severity, const char *moduul, uint16_t __line__, const c
 	va_start(arg, len);
 	l += vsnprintf(&buffer[l], (256 - l), fmt, arg);
 	va_end(arg);
-	if(l && (buffer[l - 1] == '\n')){
-		buffer[l - 1] = 0;
-		l--;
-	}
+//	if(l && (buffer[l - 1] == '\n')){
+//		buffer[l - 1] = 0;
+//		l--;
+//	}
 	for(i = 0; i < len; i++){
 		if(!(i % 4)){
 			l += snprintf(&buffer[l], (256 - l), " %02X", (unsigned int)((uint8_t *)data)[i]);
@@ -85,7 +88,7 @@ void __loggerb(uint16_t severity, const char *moduul, uint16_t __line__, const c
 	}
 	buffer[255] = 0;
 	while(osMutexAcquire(log_mutex, 1000) != osOK);
-	log_puts(buffer);
+	_write(fileno(stdout), buffer, l);
 	osMutexRelease(log_mutex);
 }
 
@@ -100,10 +103,10 @@ void logb(uint16_t severity, char *moduul, uint16_t __line__, char *fmt, void *d
 	va_start(arg, len);
 	l += vsnprintf(&buffer[l], (256 - l), fmt, arg);
 	va_end(arg);
-	if(l && (buffer[l - 1] == '\n')){
-		buffer[l - 1] = 0;
-		l--;
-	}
+//	if(l && (buffer[l - 1] == '\n')){
+//		buffer[l - 1] = 0;
+//		l--;
+//	}
 	for(i = 0; i < len; i++){
 		if(!(i % 4)){
 			l += snprintf(&buffer[l], (256 - l), " %02X", (unsigned int)((uint8_t *)data)[i]);
@@ -113,7 +116,7 @@ void logb(uint16_t severity, char *moduul, uint16_t __line__, char *fmt, void *d
 	}
 	buffer[255] = 0;
 	while(osMutexAcquire(log_mutex, 1000) != osOK);
-	log_puts(buffer);
+	_write(fileno(stdout), buffer, l);
 	osMutexRelease(log_mutex);
 }
 
