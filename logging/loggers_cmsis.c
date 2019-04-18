@@ -58,10 +58,13 @@ void __logger(uint16_t severity, const char *moduul, uint16_t __line__, const ch
 	va_end(arg);
 	//if(l && (buffer[l - 1] == '\n'))buffer[l - 1] = 0;
 	buffer[l] = '\n';
-	buffer[255] = 0;
+	//buffer[255] = 0;
+
 	while(osMutexAcquire(log_mutex, 1000) != osOK);
-	_write(fileno(stdout), buffer, l+1);
-	osMutexRelease(log_mutex);
+	_write(fileno(stdout), buffer, l+1); //l+1
+	if (osMutexRelease(log_mutex) != osOK) {
+		while(1) ;
+	}
 }
 
 
@@ -89,7 +92,9 @@ void __loggerb(uint16_t severity, const char *moduul, uint16_t __line__, const c
 	buffer[255] = 0;
 	while(osMutexAcquire(log_mutex, 1000) != osOK);
 	_write(fileno(stdout), buffer, l);
-	osMutexRelease(log_mutex);
+	if (osMutexRelease(log_mutex) != osOK) {
+		while(1) ;
+	}
 }
 
 
@@ -117,7 +122,9 @@ void logb(uint16_t severity, char *moduul, uint16_t __line__, char *fmt, void *d
 	buffer[255] = 0;
 	while(osMutexAcquire(log_mutex, 1000) != osOK);
 	_write(fileno(stdout), buffer, l);
-	osMutexRelease(log_mutex);
+	if (osMutexRelease(log_mutex) != osOK) {
+		while(1) ;
+	}
 }
 
 
