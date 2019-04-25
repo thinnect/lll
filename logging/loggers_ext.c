@@ -6,25 +6,19 @@
 #include <stdint.h>
 #include <stdarg.h>
 
-#include "cmsis_os2.h"
-
-#include "loggers_cmsis.h"
+#include "loggers_ext.h"
 
 #include "__loggers.h"
 
-extern int fileno(FILE *);
-extern int _write(int file, const char *ptr, int len);
-static int(*log_puts)(const char *);
+static int(*log_put_func)(const char*, int);
 static uint16_t log_level;
-osMutexId_t log_mutex;
-
 
 static int log_severity_char(uint16_t severity);
 
-void log_init(int(*puts)(const char *)){
-	log_puts = puts;
-	log_level = 0xFFFF;
-	log_mutex = osMutexNew(NULL);
+
+void log_init(uint16_t loglevel, int(*log_fun)(const char*, int)){
+	log_put_func = log_fun;
+	log_level = loglevel;
 }
 
 /*
@@ -41,12 +35,12 @@ void log(uint16_t severity, char *moduul, uint16_t __line__, char *fmt, ...){
 	//if(l && (buffer[l - 1] == '\n'))buffer[l - 1] = 0;
 	buffer[255] = 0;
 	while(osMutexAcquire(log_mutex, 1000) != osOK);
-	_write(fileno(stdout), buffer, l);
+	log_put_func(buffer, l);
 	osMutexRelease(log_mutex);
 }
 */
 
-void __logger(uint16_t severity, const char *moduul, uint16_t __line__, const char *fmt, ...) {
+void __logger(uint16_t severity, const char* moduul, uint16_t __line__, const char* fmt, ...) {
 	char buffer[256];
 	va_list arg;
 	int l;
@@ -60,15 +54,11 @@ void __logger(uint16_t severity, const char *moduul, uint16_t __line__, const ch
 	buffer[l] = '\n';
 	//buffer[255] = 0;
 
-	while(osMutexAcquire(log_mutex, 1000) != osOK);
-	_write(fileno(stdout), buffer, l+1); //l+1
-	if (osMutexRelease(log_mutex) != osOK) {
-		while(1) ;
-	}
+	log_put_func(buffer, l+1); //l+1
 }
 
 
-void __loggerb(uint16_t severity, const char *moduul, uint16_t __line__, const char *fmt, void *data, uint8_t len, ...){
+void __loggerb(uint16_t severity, const char* moduul, uint16_t __line__, const char* fmt, void *data, uint8_t len, ...){
 	char buffer[256];
 	va_list arg;
 	int i, l;
@@ -90,11 +80,8 @@ void __loggerb(uint16_t severity, const char *moduul, uint16_t __line__, const c
 		}
 	}
 	buffer[255] = 0;
-	while(osMutexAcquire(log_mutex, 1000) != osOK);
-	_write(fileno(stdout), buffer, l);
-	if (osMutexRelease(log_mutex) != osOK) {
-		while(1) ;
-	}
+
+	log_put_func(buffer, l);
 }
 
 
@@ -120,11 +107,8 @@ void logb(uint16_t severity, char *moduul, uint16_t __line__, char *fmt, void *d
 		}
 	}
 	buffer[255] = 0;
-	while(osMutexAcquire(log_mutex, 1000) != osOK);
-	_write(fileno(stdout), buffer, l);
-	if (osMutexRelease(log_mutex) != osOK) {
-		while(1) ;
-	}
+
+	log_put_func(buffer, l);
 }
 
 
