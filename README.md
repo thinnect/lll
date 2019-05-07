@@ -99,13 +99,14 @@ This implementation prepares the whole logging message using vsnprintf and
 passes the final message to the TOSSIM dbg system with the channel name
 "dbgchannel".
 
-### CMSIS
+### EXT
 
-`loggers_cmsis.c`
+`loggers_ext.c`
 
 This implementation prepares the whole logging message using vsnprintf and
-passes the final message to puts or a user provided function. Logging is
-synchronized with CMSIS mutexes.
+passes the final message to a user provided function that is expected to be
+thread safe. Intended for use on top of RTOS (CMSIS) and LDMA loggers, but can
+be easily connected to fwrite and such.
 
 ### Linux
 
