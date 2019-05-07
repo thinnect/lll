@@ -27,7 +27,7 @@ void __logger(uint16_t severity, const char* moduul, uint16_t __line__, const ch
 	int l;
 	if(!(log_level & severity))return;
 	l = 0;
-	l += snprintf(&buffer[l], (256 - l), "%c|%s:%4u| ", log_severity_char(severity), moduul, (unsigned int)__line__);
+	l += snprintf(&buffer[l], (256 - l), "%c|%s:%4u|", log_severity_char(severity), moduul, (unsigned int)__line__);
 	va_start(arg, fmt);
 	l += vsnprintf(&buffer[l], (256 - l), fmt, arg);
 	va_end(arg);
@@ -45,7 +45,7 @@ void __loggerb(uint16_t severity, const char* moduul, uint16_t __line__, const c
 	int i, l;
 	if(!(log_level & severity))return;
 	l = 0;
-	l += snprintf(&buffer[l], (256 - l), "%c|%s:%4u| ", log_severity_char(severity), moduul, (unsigned int)__line__);
+	l += snprintf(&buffer[l], (256 - l), "%c|%s:%4u|", log_severity_char(severity), moduul, (unsigned int)__line__);
 	va_start(arg, len);
 	l += vsnprintf(&buffer[l], (256 - l), fmt, arg);
 	va_end(arg);
