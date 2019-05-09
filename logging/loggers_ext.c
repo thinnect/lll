@@ -5,19 +5,21 @@
 #include <stdio.h>
 #include <stdint.h>
 #include <stdarg.h>
+#include <inttypes.h>
 
 #include "loggers_ext.h"
 
 #include "__loggers.h"
 
 static int(*log_put_func)(const char*, int);
+static uint32_t(*log_time_func)();
 static uint16_t log_level;
 
 static int log_severity_char(uint16_t severity);
 
-
-void log_init(uint16_t loglevel, int(*log_fun)(const char*, int)){
+void log_init(uint16_t loglevel, int(*log_fun)(const char*, int), uint32_t(*time_fun)()) {
 	log_put_func = log_fun;
+	log_time_func = time_fun;
 	log_level = loglevel;
 }
 
@@ -27,7 +29,14 @@ void __logger(uint16_t severity, const char* moduul, uint16_t __line__, const ch
 	int l;
 	if(!(log_level & severity))return;
 	l = 0;
-	l += snprintf(&buffer[l], (256 - l), "%c|%s:%4u|", log_severity_char(severity), moduul, (unsigned int)__line__);
+	if(log_time_func != NULL) {
+		l += snprintf(&buffer[l], (256 - l), "#%08"PRIx32"# %c|%s:%4u|", log_time_func(),
+		              log_severity_char(severity), moduul, (unsigned int)__line__);
+	}
+	else {
+		l += snprintf(&buffer[l], (256 - l), "%c|%s:%4u|",
+			          log_severity_char(severity), moduul, (unsigned int)__line__);
+	}
 	va_start(arg, fmt);
 	l += vsnprintf(&buffer[l], (256 - l), fmt, arg);
 	va_end(arg);
@@ -39,13 +48,20 @@ void __logger(uint16_t severity, const char* moduul, uint16_t __line__, const ch
 }
 
 
-void __loggerb(uint16_t severity, const char* moduul, uint16_t __line__, const char* fmt, void *data, uint8_t len, ...){
+void __loggerb(uint16_t severity, const char* moduul, uint16_t __line__, const char* fmt, void *data, uint8_t len, ...) {
 	char buffer[256];
 	va_list arg;
 	int i, l;
 	if(!(log_level & severity))return;
 	l = 0;
-	l += snprintf(&buffer[l], (256 - l), "%c|%s:%4u|", log_severity_char(severity), moduul, (unsigned int)__line__);
+	if(log_time_func != NULL) {
+		l += snprintf(&buffer[l], (256 - l), "#%08"PRIx32"# %c|%s:%4u|", log_time_func(),
+		              log_severity_char(severity), moduul, (unsigned int)__line__);
+	}
+	else {
+		l += snprintf(&buffer[l], (256 - l), "%c|%s:%4u|",
+		              log_severity_char(severity), moduul, (unsigned int)__line__);
+	}
 	va_start(arg, len);
 	l += vsnprintf(&buffer[l], (256 - l), fmt, arg);
 	va_end(arg);
@@ -69,7 +85,7 @@ void __loggerb(uint16_t severity, const char* moduul, uint16_t __line__, const c
 }
 
 
-static int log_severity_char(uint16_t severity){
+static int log_severity_char(uint16_t severity) {
 	if(severity & LOG_ERR1)return('E');
 	if(severity & LOG_ERR2)return('E');
 	if(severity & LOG_ERR3)return('E');
