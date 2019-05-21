@@ -12,7 +12,7 @@
 		if( (severity) & __LOG_LEVEL__){	\
 			STATIC_CONST char moduulROM[] PROGMEM = __MODUUL__;	\
 			STATIC_CONST char strROM[] PROGMEM = str;	\
-			__loggerm( severity, moduulROM, __LINE__, strROM, msg , ##args  );	\
+			__loggerb( severity, moduulROM, __LINE__, strROM, msg , sizeof(message_t) , ##args  );	\
 		}	\
 	})
 #else
