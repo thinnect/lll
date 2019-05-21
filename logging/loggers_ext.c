@@ -21,6 +21,11 @@ void log_init(uint16_t loglevel, int(*log_fun)(const char*, int), uint32_t(*time
 	log_put_func = log_fun;
 	log_time_func = time_fun;
 	log_level = loglevel;
+
+	if(log_time_func != NULL) {
+		char buffer[17];
+		log_put_func(buffer, snprintf(buffer, 17, "%08"PRIx32" B|BOOT\n", log_time_func()));
+	}
 }
 
 void __logger(uint16_t severity, const char* moduul, uint16_t __line__, const char* fmt, ...) {
@@ -30,7 +35,7 @@ void __logger(uint16_t severity, const char* moduul, uint16_t __line__, const ch
 	if(!(log_level & severity))return;
 	l = 0;
 	if(log_time_func != NULL) {
-		l += snprintf(&buffer[l], (256 - l), "#%08"PRIx32"# %c|%s:%4u|", log_time_func(),
+		l += snprintf(&buffer[l], (256 - l), "%08"PRIx32" %c|%s:%4u|", log_time_func(),
 		              log_severity_char(severity), moduul, (unsigned int)__line__);
 	}
 	else {
@@ -55,7 +60,7 @@ void __loggerb(uint16_t severity, const char* moduul, uint16_t __line__, const c
 	if(!(log_level & severity))return;
 	l = 0;
 	if(log_time_func != NULL) {
-		l += snprintf(&buffer[l], (256 - l), "#%08"PRIx32"# %c|%s:%4u|", log_time_func(),
+		l += snprintf(&buffer[l], (256 - l), "%08"PRIx32" %c|%s:%4u|", log_time_func(),
 		              log_severity_char(severity), moduul, (unsigned int)__line__);
 	}
 	else {
