@@ -20,9 +20,9 @@
 
 // these triple macros enable us to use something like this:
 // uartqueue_putstr("E| " ## __LINE_STRING__ ## "\n");
-#define STRINGIZE(x) STRINGIZE2(x)
-#define STRINGIZE2(x) #x
-#define __LINE_STRING__ STRINGIZE(__LINE__)
+#define __LINE_STRINGIZE(x) __LINE_STRINGIZE2(x)
+#define __LINE_STRINGIZE2(x) #x
+#define __LINE_STRING__ __LINE_STRINGIZE(__LINE__)
 
 #if defined(__LOG_LEVEL__) && __LOG_LEVEL__!=0
 	#define logger(severity, str, args...)				({\
