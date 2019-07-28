@@ -39,7 +39,7 @@ ifneq ($(BASE_LOG_LEVEL),0)
         PFLAGS += $(LLL_MAKEFILE_LOCATION)/../../../logging/loggers_msg_std.c
     else
         PFLAGS += $(LLL_MAKEFILE_LOCATION)/../../../logging/loggers_hw.c
-        PFLAGS += $(LLL_MAKEFILE_LOCATION)/../../../logging/loggers_msg_hw.c
+        #PFLAGS += $(LLL_MAKEFILE_LOCATION)/../../../logging/loggers_msg_hw.c
     endif
 else
     PFLAGS += -DBASE_LOG_LEVEL=0x0000
