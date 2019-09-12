@@ -53,7 +53,7 @@ void __logger(uint16_t severity, const char* moduul, uint16_t __line__, const ch
 }
 
 
-void __loggerb(uint16_t severity, const char* moduul, uint16_t __line__, const char* fmt, void *data, uint8_t len, ...) {
+void __loggerb(uint16_t severity, const char* moduul, uint16_t __line__, const char* fmt, const void *data, uint8_t len, ...) {
 	char buffer[256];
 	va_list arg;
 	int i, l;

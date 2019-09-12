@@ -55,7 +55,7 @@ void __loghead( uint16_t severity, PGM_P _file_, unsigned _line_ )
 	putchar( '|' );
 }
 
-void __logmem( void* _data, uint8_t len )
+void __logmem( const void* _data, uint8_t len )
 {
 	uint8_t* data = (uint8_t*)_data;
 	int i;
@@ -130,7 +130,7 @@ void __loggerb( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P str, v
 	va_end( a );
 }
 
-void __loggerb2( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P str1, void* data1, uint8_t len1, PGM_P str2, void* data2, uint8_t len2, ...)
+void __loggerb2( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P str1, const void* data1, uint8_t len1, PGM_P str2, const void* data2, uint8_t len2, ...)
 {
 	va_list a;
 

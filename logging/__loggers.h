@@ -66,8 +66,8 @@ void __loggernnl( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P form
 void __vlogger( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P format, va_list a );
 void __logger( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P format, ... );
 void __nanologger(PGM_P format, ... );
-void __vloggerb( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P str, void* data, uint8_t len, va_list a);
-void __loggerb( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P str, void* data, uint8_t len, ...);
-void __loggerb2( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P str1, void* data1, uint8_t len1, PGM_P str2, void* data2, uint8_t len2, ...);
+void __vloggerb( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P str, const void* data, uint8_t len, va_list a);
+void __loggerb( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P str, const void* data, uint8_t len, ...);
+void __loggerb2( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P str1, const void* data1, uint8_t len1, PGM_P str2, void* data2, uint8_t len2, ...);
 
 #endif // __LOGGERS_H
