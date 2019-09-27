@@ -110,7 +110,7 @@ void __nanologger(PGM_P format, ... )
 	va_end( a );
 }
 
-void __vloggerb( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P str, void* data, uint8_t len, va_list a)
+void __vloggerb( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P str, const void* data, uint8_t len, va_list a)
 {
 	__loghead( severity, moduul, __line__ );
 
@@ -121,7 +121,7 @@ void __vloggerb( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P str, 
 	printfflush();
 }
 
-void __loggerb( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P str, void* data, uint8_t len, ...)
+void __loggerb( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P str, const void* data, uint8_t len, ...)
 {
 	va_list a;
 
