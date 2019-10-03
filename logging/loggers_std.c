@@ -126,7 +126,7 @@ void __logger( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P format,
 	}
 }
 
-void __vloggerb( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P str, void* data, uint8_t len, va_list a)
+void __vloggerb( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P str, const void* data, uint8_t len, va_list a)
 {
 	char timestr[80];
 	__getTimestamp(timestr, sizeof(timestr));
@@ -134,7 +134,7 @@ void __vloggerb( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P str, 
 	printf("%s %c|%13s:%4d|__vloggerb\n", timestr, sev(severity), module_name(moduul), __line__);
 }
 
-void __loggerb( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P format, void* data, uint8_t len, ...)
+void __loggerb( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P format, const void* data, uint8_t len, ...)
 {
 	char timestr[80];
 	va_list a;
