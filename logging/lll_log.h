@@ -2,8 +2,8 @@
  * @author Andrei Lunjov, Raido Pahtma, Andres Vahter
  * @license MIT
 */
-#ifndef LOG_H
-#define LOG_H
+#ifndef LLL_LOG_H
+#define LLL_LOG_H
 
 #include "__loggers.h"
 
@@ -169,29 +169,29 @@
 #define warnds4(def, str, args...)		loggerds( LOG_WARN4, def, str, ##args )
 
 
-#define logerr(str, args...)				logger( LOG_ERR2, str , ##args )
-#define logerrb(str, data, len, args...)	loggerb( LOG_ERR2, str, data, len , ##args )
-#define logerrd(def, args...)				loggerd( LOG_ERR2, def, ##args )
-#define logerrds1(def, str, args...)		loggerds( LOG_ERR2, def, str, ##args )
+#define logerr(str, args...)				logger( LOG_ERROR2, str , ##args )
+#define logerrb(str, data, len, args...)	loggerb( LOG_ERROR2, str, data, len , ##args )
+#define logerrd(def, args...)				loggerd( LOG_ERROR2, def, ##args )
+#define logerrds1(def, str, args...)		loggerds( LOG_ERROR2, def, str, ##args )
 
-#define err1(str, args...)				logger( LOG_ERR1, str , ##args )
-#define errb1(str, data, len, args...)	loggerb( LOG_ERR1, str, data, len , ##args )
-#define errd1(def, args...)				loggerd( LOG_ERR1, def, ##args )
-#define errds1(def, str, args...)		loggerds( LOG_ERR1, def, str, ##args )
+#define err1(str, args...)				logger( LOG_ERROR1, str , ##args )
+#define errb1(str, data, len, args...)	loggerb( LOG_ERROR1, str, data, len , ##args )
+#define errd1(def, args...)				loggerd( LOG_ERROR1, def, ##args )
+#define errds1(def, str, args...)		loggerds( LOG_ERROR1, def, str, ##args )
 
-#define err2(str, args...)				logger( LOG_ERR2, str , ##args )
-#define errb2(str, data, len, args...)	loggerb( LOG_ERR2, str, data, len , ##args )
-#define errd2(def, args...)				loggerd( LOG_ERR2, def, ##args )
-#define errds2(def, str, args...)		loggerds( LOG_ERR2, def, str, ##args )
+#define err2(str, args...)				logger( LOG_ERROR2, str , ##args )
+#define errb2(str, data, len, args...)	loggerb( LOG_ERROR2, str, data, len , ##args )
+#define errd2(def, args...)				loggerd( LOG_ERROR2, def, ##args )
+#define errds2(def, str, args...)		loggerds( LOG_ERROR2, def, str, ##args )
 
-#define err3(str, args...)				logger( LOG_ERR3, str , ##args )
-#define errb3(str, data, len, args...)	loggerb( LOG_ERR3, str, data, len , ##args )
-#define errd3(def, args...)				loggerd( LOG_ERR3, def, ##args )
-#define errds3(def, str, args...)		loggerds( LOG_ERR3, def, str, ##args )
+#define err3(str, args...)				logger( LOG_ERROR3, str , ##args )
+#define errb3(str, data, len, args...)	loggerb( LOG_ERROR3, str, data, len , ##args )
+#define errd3(def, args...)				loggerd( LOG_ERROR3, def, ##args )
+#define errds3(def, str, args...)		loggerds( LOG_ERROR3, def, str, ##args )
 
-#define err4(str, args...)				logger( LOG_ERR4, str , ##args )
-#define errb4(str, data, len, args...)	loggerb( LOG_ERR4, str, data, len , ##args )
-#define errd4(def, args...)				loggerd( LOG_ERR4, def, ##args )
-#define errds4(def, str, args...)		loggerds( LOG_ERR4, def, str, ##args )
+#define err4(str, args...)				logger( LOG_ERROR4, str , ##args )
+#define errb4(str, data, len, args...)	loggerb( LOG_ERROR4, str, data, len , ##args )
+#define errd4(def, args...)				loggerd( LOG_ERROR4, def, ##args )
+#define errds4(def, str, args...)		loggerds( LOG_ERROR4, def, str, ##args )
 
-#endif // LOG_H
+#endif // LLL_LOG_H

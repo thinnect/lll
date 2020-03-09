@@ -17,7 +17,7 @@ static uint16_t log_level;
 
 static int log_severity_char(uint16_t severity);
 
-void log_init(uint16_t loglevel, int(*log_fun)(const char*, int), uint32_t(*time_fun)()) {
+void lll_log_init(uint16_t loglevel, int(*log_fun)(const char*, int), uint32_t(*time_fun)()) {
 	log_put_func = log_fun;
 	log_time_func = time_fun;
 	log_level = loglevel;
@@ -91,10 +91,10 @@ void __loggerb(uint16_t severity, const char* moduul, uint16_t __line__, const c
 
 
 static int log_severity_char(uint16_t severity) {
-	if(severity & LOG_ERR1)return('E');
-	if(severity & LOG_ERR2)return('E');
-	if(severity & LOG_ERR3)return('E');
-	if(severity & LOG_ERR4)return('E');
+	if(severity & LOG_ERROR1)return('E');
+	if(severity & LOG_ERROR2)return('E');
+	if(severity & LOG_ERROR3)return('E');
+	if(severity & LOG_ERROR4)return('E');
 	if(severity & LOG_WARN1)return('W');
 	if(severity & LOG_WARN2)return('W');
 	if(severity & LOG_WARN3)return('W');

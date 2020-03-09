@@ -5,7 +5,7 @@
 #ifndef LOG_MSG_H
 #define LOG_MSG_H
 
-#include "log.h"
+#include "lll_log.h"
 
 #if defined(__LOG_LEVEL__) && __LOG_LEVEL__!=0
 	#define loggerm(severity, str, msg, args...) 		({	\
@@ -37,11 +37,11 @@
 #define warnm3(str, msg, args...)  loggerm( LOG_WARN3, str, msg , ##args )
 #define warnm4(str, msg, args...)  loggerm( LOG_WARN4, str, msg , ##args )
 
-#define logerrm(str, msg, args...) loggerm( LOG_ERR2, str, msg , ##args )
-#define errm1(str, msg, args...)   loggerm( LOG_ERR1, str, msg , ##args )
-#define errm2(str, msg, args...)   loggerm( LOG_ERR2, str, msg , ##args )
-#define errm3(str, msg, args...)   loggerm( LOG_ERR3, str, msg , ##args )
-#define errm4(str, msg, args...)   loggerm( LOG_ERR4, str, msg , ##args )
+#define logerrm(str, msg, args...) loggerm( LOG_ERROR2, str, msg , ##args )
+#define errm1(str, msg, args...)   loggerm( LOG_ERROR1, str, msg , ##args )
+#define errm2(str, msg, args...)   loggerm( LOG_ERROR2, str, msg , ##args )
+#define errm3(str, msg, args...)   loggerm( LOG_ERROR3, str, msg , ##args )
+#define errm4(str, msg, args...)   loggerm( LOG_ERROR4, str, msg , ##args )
 
 void __loggerm( uint16_t severity, PGM_P moduul, uint16_t __line__, PGM_P str, message_t* msg, ... );
 

@@ -24,15 +24,15 @@
 #define LOG_WARN2        0x0400
 #define LOG_WARN1        0x0800
 
-#define LOG_ERR4         0x1000
-#define LOG_ERR3         0x2000
-#define LOG_ERR2         0x4000
-#define LOG_ERR1         0x8000
+#define LOG_ERROR4       0x1000
+#define LOG_ERROR3       0x2000
+#define LOG_ERROR2       0x4000
+#define LOG_ERROR1       0x8000
 
 #define LOG_LEVEL_DEBUG  0xFFFF
 #define LOG_LEVEL_INFO   0xFFF0
 #define LOG_LEVEL_WARN   0xFF00
-#define LOG_LEVEL_ERR    0xF000
+#define LOG_LEVEL_ERROR  0xF000
 
 #define LOG_LEVEL_ASSERT LOG_ERR4
 
