@@ -17,6 +17,7 @@ static uint16_t log_level;
 
 static int log_severity_char(uint16_t severity);
 
+
 void log_init(uint16_t loglevel, int(*log_fun)(const char*, int), uint32_t(*time_fun)()) {
 	log_put_func = log_fun;
 	log_time_func = time_fun;
@@ -28,63 +29,69 @@ void log_init(uint16_t loglevel, int(*log_fun)(const char*, int), uint32_t(*time
 	}
 }
 
+
 void __logger(uint16_t severity, const char* moduul, uint16_t __line__, const char* fmt, ...) {
+	if(!(log_level & severity))return;
+
 	char buffer[256];
 	va_list arg;
-	int l;
-	if(!(log_level & severity))return;
-	l = 0;
+	int l = 0;
+
 	if(log_time_func != NULL) {
-		l += snprintf(&buffer[l], (256 - l), "%08"PRIx32" %c|%s:%4u|", log_time_func(),
+		l += snprintf(&buffer[l], (sizeof(buffer) - l), "%08"PRIx32" %c|%s:%4u|", log_time_func(),
 		              log_severity_char(severity), moduul, (unsigned int)__line__);
 	}
 	else {
-		l += snprintf(&buffer[l], (256 - l), "%c|%s:%4u|",
+		l += snprintf(&buffer[l], (sizeof(buffer) - l), "%c|%s:%4u|",
 			          log_severity_char(severity), moduul, (unsigned int)__line__);
 	}
 	va_start(arg, fmt);
-	l += vsnprintf(&buffer[l], (256 - l), fmt, arg);
+	l += vsnprintf(&buffer[l], (sizeof(buffer) - l), fmt, arg);
 	va_end(arg);
-	//if(l && (buffer[l - 1] == '\n'))buffer[l - 1] = 0;
+
+	if(l > (sizeof(buffer)-2)) { // Make space for \n\0
+		l = (sizeof(buffer)-2);
+	}
 	buffer[l] = '\n';
-	//buffer[255] = 0;
+	buffer[l+1] = 0;
 
 	log_put_func(buffer, l+1);
 }
 
 
 void __loggerb(uint16_t severity, const char* moduul, uint16_t __line__, const char* fmt, const void *data, uint8_t len, ...) {
+	if(!(log_level & severity))return;
+
 	char buffer[256];
 	va_list arg;
-	int i, l;
-	if(!(log_level & severity))return;
-	l = 0;
+	int l = 0;
+
 	if(log_time_func != NULL) {
-		l += snprintf(&buffer[l], (256 - l), "%08"PRIx32" %c|%s:%4u|", log_time_func(),
+		l += snprintf(&buffer[l], (sizeof(buffer) - l), "%08"PRIx32" %c|%s:%4u|", log_time_func(),
 		              log_severity_char(severity), moduul, (unsigned int)__line__);
 	}
 	else {
-		l += snprintf(&buffer[l], (256 - l), "%c|%s:%4u|",
+		l += snprintf(&buffer[l], (sizeof(buffer) - l), "%c|%s:%4u|",
 		              log_severity_char(severity), moduul, (unsigned int)__line__);
 	}
 	va_start(arg, len);
-	l += vsnprintf(&buffer[l], (256 - l), fmt, arg);
+	l += vsnprintf(&buffer[l], (sizeof(buffer) - l), fmt, arg);
 	va_end(arg);
-//	if(l && (buffer[l - 1] == '\n')){
-//		buffer[l - 1] = 0;
-//		l--;
-//	}
-	for(i = 0; i < len; i++){
-		if(l < 255) {
+
+	for(int i = 0; i < len; i++){
+		if(l < (sizeof(buffer)-1)) {
 			if(!(i % 4)){
-				l += snprintf(&buffer[l], (256 - l), " %02X", (unsigned int)((uint8_t *)data)[i]);
+				l += snprintf(&buffer[l], (sizeof(buffer) - l), " %02X", (unsigned int)((uint8_t *)data)[i]);
 			}else{
-				l += snprintf(&buffer[l], (256 - l), "%02X", (unsigned int)((uint8_t *)data)[i]);
+				l += snprintf(&buffer[l], (sizeof(buffer) - l), "%02X", (unsigned int)((uint8_t *)data)[i]);
 			}
 		}
 	}
+	if(l > (sizeof(buffer)-2)) { // Make space for \n\0
+		l = (sizeof(buffer)-2);
+	}
 	buffer[l] = '\n';
-	//buffer[255] = 0;
+	buffer[l+1] = 0;
 
 	log_put_func(buffer, l+1);
 }
