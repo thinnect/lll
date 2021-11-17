@@ -52,8 +52,8 @@
 #define PROGMEM
 #endif
 
-int printfflush();
-uint32_t _getLocalTimeRadio();
+int printfflush(void);
+uint32_t _getLocalTimeRadio(void);
 
 void putsr( PGM_P str, uint8_t len );
 
