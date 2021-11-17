@@ -25,8 +25,8 @@ static platform_mutex_t m_log_mutex;
 
 
 static int log_severity_char (uint16_t severity);
-static void log_mutex_acquire ();
-static void log_mutex_release ();
+static void log_mutex_acquire (void);
+static void log_mutex_release (void);
 
 
 void log_init (uint16_t loglevel, int(*log_fun)(const char*, int), uint32_t(*time_fun)(), platform_mutex_t mutex)
@@ -164,7 +164,7 @@ static int log_severity_char (uint16_t severity)
 }
 
 
-static void log_mutex_acquire ()
+static void log_mutex_acquire (void)
 {
 	if (NULL != m_log_mutex)
 	{
@@ -173,7 +173,7 @@ static void log_mutex_acquire ()
 }
 
 
-static void log_mutex_release ()
+static void log_mutex_release (void)
 {
 	platform_mutex_release(m_log_mutex);
 }
