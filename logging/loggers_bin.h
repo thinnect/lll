@@ -1,3 +1,9 @@
+/**
+ * Debug logger log formatter.
+ *
+ * Copyright Thinnect Inc. 2021
+ * @license MIT
+ */
 #ifndef LOGGER_BIN_H
 #define LOGGER_BIN_H
 

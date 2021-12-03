@@ -1,3 +1,11 @@
+/**
+ * Debug logger log formatter.
+ *
+ * Copyright Thinnect Inc. 2021
+ * @author Enari Saar
+ * @license MIT
+*/
+
 #include <stdio.h>
 #include <stdint.h>
 #include <stdarg.h>
