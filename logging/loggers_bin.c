@@ -40,11 +40,6 @@ static int log_severity_char(uint16_t severity);
 static void log_mutex_acquire(void);
 static void log_mutex_release(void);
 
-typedef enum {
-	MAIN_MODULE = 0x0,
-	RADIO_MODULE,
-} module_id_t;
-
 
 uint16_t get_module_id(const char* moduul)
 {
