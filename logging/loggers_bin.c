@@ -24,7 +24,7 @@
 #include "modules_bin_list.h"
 
 #define MAX_ARG_COUNT 8
-#define ARG_BUFFER_SIZE (512)
+#define ARG_BUFFER_SIZE (64)
 #define MAX_DATA_SIZE (ARG_BUFFER_SIZE + 4)
 #define MAX_LOG_PACKET_SIZE (MAX_DATA_SIZE + 2)
 
@@ -58,12 +58,6 @@ void log_init(uint16_t loglevel, int (*log_fun)(const char *, int), uint32_t (*t
     m_log_level = loglevel;
     m_log_mutex = mutex;
 
-    if (NULL != mf_log_time)
-    {
-        uint32_t ts = mf_log_time();
-        log_mutex_acquire();
-        log_mutex_release();
-    }
 }
 
 void __logger(uint16_t severity, const char *moduul, uint16_t __line__, const char *fmt, ...)
@@ -155,19 +149,6 @@ void __logger(uint16_t severity, const char *moduul, uint16_t __line__, const ch
                 pos += sizeof(x);
                 break;
             }
-            case 'p':
-            {
-                void *x = va_arg(arg, void *);
-                memcpy(&args[pos], &x, sizeof(x));
-                pos += sizeof(x);
-                break;
-            }
-            case 's':
-            {
-                char *s = va_arg(arg, char *);
-                memcpy(&args[pos], s, strlen(s));
-                pos += strlen(s);
-            }
             }
         }
         fmt++;
@@ -190,7 +171,7 @@ void __logger(uint16_t severity, const char *moduul, uint16_t __line__, const ch
     if (status != -1)
     {
         PLATFORM_LedsSet(1);
-        mf_log_put(log_packet, 2 + total_size);
+        mf_log_put(&log_packet[0], 2 + total_size);
         PLATFORM_LedsSet(0);
     }
     log_mutex_release();
@@ -316,7 +297,7 @@ void __loggerb(uint16_t severity, const char *moduul, uint16_t __line__,
     }
     if (len != 0)
     {
-        memcpy(&_data[pos], &data[0], len);
+        memcpy(&_data[4+pos], &data[0], len);
         pos += len;
     }
     uint8_t total_size = 4 + pos;
@@ -330,6 +311,7 @@ void __loggerb(uint16_t severity, const char *moduul, uint16_t __line__,
         PLATFORM_LedsSet(0);
     }
     log_mutex_release();
+    
 }
 
 static int log_severity_char(uint16_t severity)
