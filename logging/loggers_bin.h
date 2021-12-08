@@ -7,6 +7,8 @@
 #ifndef LOGGER_BIN_H
 #define LOGGER_BIN_H
 
+#include "platform_mutex.h"
+
 /**
  * Initialize the logger.
  *
