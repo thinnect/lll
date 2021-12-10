@@ -172,9 +172,7 @@ void __logger(uint16_t severity, const char *moduul, uint16_t __line__, const ch
     log_mutex_acquire();
     if (status != -1)
     {
-        PLATFORM_LedsSet(1);
         mf_log_put(&log_packet[0], 2 + total_size);
-        PLATFORM_LedsSet(0);
     }
     log_mutex_release();
 }
@@ -309,49 +307,10 @@ void __loggerb(uint16_t severity, const char *moduul, uint16_t __line__,
     log_mutex_acquire();
     if (status != -1)
     {
-        PLATFORM_LedsSet(1);
         mf_log_put(log_packet, 2 + total_size);
-        PLATFORM_LedsSet(0);
     }
     log_mutex_release();
     
-}
-
-static int log_severity_char(uint16_t severity)
-{
-    if (severity & LOG_ERR1)
-        return ('E');
-    if (severity & LOG_ERR2)
-        return ('E');
-    if (severity & LOG_ERR3)
-        return ('E');
-    if (severity & LOG_ERR4)
-        return ('E');
-    if (severity & LOG_WARN1)
-        return ('W');
-    if (severity & LOG_WARN2)
-        return ('W');
-    if (severity & LOG_WARN3)
-        return ('W');
-    if (severity & LOG_WARN4)
-        return ('W');
-    if (severity & LOG_INFO1)
-        return ('I');
-    if (severity & LOG_INFO2)
-        return ('I');
-    if (severity & LOG_INFO3)
-        return ('I');
-    if (severity & LOG_INFO4)
-        return ('I');
-    if (severity & LOG_DEBUG1)
-        return ('D');
-    if (severity & LOG_DEBUG2)
-        return ('D');
-    if (severity & LOG_DEBUG3)
-        return ('D');
-    if (severity & LOG_DEBUG4)
-        return ('D');
-    return ('X');
 }
 
 static void log_mutex_acquire(void)
