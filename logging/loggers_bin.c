@@ -24,11 +24,12 @@
 #include "modules_bin_list.h"
 
 #define MAX_ARG_COUNT 8
-#define ARG_BUFFER_SIZE (64)
+#define ARG_BUFFER_SIZE (MAX_ARG_COUNT * 8)
 #define MAX_DATA_SIZE (ARG_BUFFER_SIZE + 4)
 #define MAX_LOG_PACKET_SIZE (MAX_DATA_SIZE + 2)
 
 static uint16_t m_log_level;
+static uint16_t m_buffer[512];
 
 static int (*mf_log_put)(const char *, int);
 static uint32_t (*mf_log_time)(void);
@@ -49,6 +50,7 @@ uint16_t get_module_id(const char *moduul)
             return mod_id[i];
         }
     }
+    return -1;
 }
 
 void log_init(uint16_t loglevel, int (*log_fun)(const char *, int), uint32_t (*time_fun)(), platform_mutex_t mutex)
@@ -297,6 +299,7 @@ void __loggerb(uint16_t severity, const char *moduul, uint16_t __line__,
     }
     if (len != 0)
     {
+        //Needs to be changed. Limits buffer size quite a lot since you cant allocate 512bytes of stack everytime.
         memcpy(&_data[4+pos], &data[0], len);
         pos += len;
     }
