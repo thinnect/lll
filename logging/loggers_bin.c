@@ -35,23 +35,8 @@ static int (*mf_log_put)(const char *, int);
 static uint32_t (*mf_log_time)(void);
 static platform_mutex_t m_log_mutex;
 
-static int log_severity_char(uint16_t severity);
 static void log_mutex_acquire(void);
 static void log_mutex_release(void);
-
-uint16_t get_module_id(const char *moduul)
-{
-    char *str_module[] = LIST_OF_MODULES;
-    uint16_t mod_id[] = LIST_OF_MOD_ID;
-    for (int i = 0; i < NUMBER_OF_MODULES; i++)
-    {
-        if (strcmp(moduul, str_module[i]) == 0)
-        {
-            return mod_id[i];
-        }
-    }
-    return -1;
-}
 
 void log_init(uint16_t loglevel, int (*log_fun)(const char *, int), uint32_t (*time_fun)(), platform_mutex_t mutex)
 {
@@ -59,107 +44,26 @@ void log_init(uint16_t loglevel, int (*log_fun)(const char *, int), uint32_t (*t
     mf_log_time = time_fun;
     m_log_level = loglevel;
     m_log_mutex = mutex;
-
 }
 
-void __logger(uint16_t severity, const char *moduul, uint16_t __line__, const char *fmt, ...)
+void __logger(uint16_t severity, uint16_t modid, uint16_t __line__, const char *fmt, uint16_t numargs, ...)
 {
     if (!(m_log_level & severity))
     {
         return;
     }
 
-    uint16_t mod_id = get_module_id(moduul);
+    uint8_t args[ARG_BUFFER_SIZE] = {0};
+    uint32_t pos = 0;
 
     va_list arg;
     va_start(arg, fmt);
-
-    uint8_t args[ARG_BUFFER_SIZE] = {0};
-    uint8_t pos = 0;
-
-    while (*fmt)
-    {
-        if (*fmt == '%')
-        {
-            bool has_l_modifer = false;
-            bool has_ll_modifer = false;
-            if (*(fmt + 1) == 'l')
-            {
-                if (*(fmt + 2) == 'l')
-                {
-                    has_ll_modifer = true;
-                    fmt += 2;
-                }
-                else
-                {
-                    has_l_modifer = true;
-                    fmt++;
-                }
-            }
-            switch (*(++fmt))
-            {
-            case 'u':
-            case 'x':
-            {
-                if (has_l_modifer)
-                {
-                    uint32_t x = va_arg(arg, uint32_t);
-                    memcpy(&args[pos], &x, sizeof(x));
-                    pos += sizeof(x);
-                }
-                else if (has_ll_modifer)
-                {
-                    uint64_t x = va_arg(arg, uint64_t);
-                    memcpy(&args[pos], &x, sizeof(x));
-                    pos += sizeof(x);
-                }
-                else
-                {
-                    uint16_t x = va_arg(arg, unsigned int);
-                    memcpy(&args[pos], &x, sizeof(x));
-                    pos += sizeof(x);
-                }
-                break;
-            }
-            case 'i':
-            case 'd':
-            {
-                if (has_l_modifer)
-                {
-                    int32_t x = va_arg(arg, long int);
-                    memcpy(&args[pos], &x, sizeof(x));
-                    pos += sizeof(x);
-                }
-                else if (has_ll_modifer)
-                {
-                    int64_t x = va_arg(arg, long long int);
-                    memcpy(&args[pos], &x, sizeof(x));
-                    pos += sizeof(x);
-                }
-                else
-                {
-                    int16_t x = va_arg(arg, int);
-                    memcpy(&args[pos], &x, sizeof(x));
-                    pos += sizeof(x);
-                }
-                break;
-            }
-            case 'f':
-            {
-                double x = va_arg(arg, double);
-                memcpy(&args[pos], &x, sizeof(x));
-                pos += sizeof(x);
-                break;
-            }
-            }
-        }
-        fmt++;
-    }
+    read_format(fmt,arg,&args[0],&pos);
     va_end(arg);
 
     uint8_t data[MAX_DATA_SIZE] = {0};
-    data[0] = mod_id & 0xFF00;   //Module ID
-    data[1] = mod_id & 0x00FF;   //Module ID
+    data[0] = modid & 0xFF00;   //Module ID
+    data[1] = modid & 0x00FF;   //Module ID
     data[2] = __line__ & 0xFF00; //line nr
     data[3] = __line__ & 0x00FF; //line nr
     if (pos != 0)                // if no arguments no point of copying the args array
@@ -177,118 +81,25 @@ void __logger(uint16_t severity, const char *moduul, uint16_t __line__, const ch
     log_mutex_release();
 }
 
-void __loggerb(uint16_t severity, const char *moduul, uint16_t __line__,
-               const char *fmt, const void *data, uint8_t len, ...)
+void __loggerb(uint16_t severity, uint16_t modid, uint16_t __line__,
+               const char *fmt, const void *data, uint8_t len, uint16_t numargs, ...)
 {
     if (!(m_log_level & severity))
     {
         return;
     }
 
-    uint16_t mod_id = get_module_id(moduul);
-
-    va_list arg;
-    va_start(arg, fmt);
-
     uint8_t args[ARG_BUFFER_SIZE] = {0};
     uint8_t pos = 0;
 
-    while (*fmt)
-    {
-        if (*fmt == '%')
-        {
-            bool has_l_modifer = false;
-            bool has_ll_modifer = false;
-            if (*(fmt + 1) == 'l')
-            {
-                if (*(fmt + 2) == 'l')
-                {
-                    has_ll_modifer = true;
-                    fmt += 2;
-                }
-                else
-                {
-                    has_l_modifer = true;
-                    fmt++;
-                }
-            }
-            switch (*(++fmt))
-            {
-            case 'u':
-            case 'x':
-            {
-                if (has_l_modifer)
-                {
-                    uint32_t x = va_arg(arg, uint32_t);
-                    memcpy(&args[pos], &x, sizeof(x));
-                    pos += sizeof(x);
-                }
-                else if (has_ll_modifer)
-                {
-                    uint64_t x = va_arg(arg, uint64_t);
-                    memcpy(&args[pos], &x, sizeof(x));
-                    pos += sizeof(x);
-                }
-                else
-                {
-                    uint16_t x = va_arg(arg, unsigned int);
-                    memcpy(&args[pos], &x, sizeof(x));
-                    pos += sizeof(x);
-                }
-                break;
-            }
-            case 'i':
-            case 'd':
-            {
-                if (has_l_modifer)
-                {
-                    int32_t x = va_arg(arg, long int);
-                    memcpy(&args[pos], &x, sizeof(x));
-                    pos += sizeof(x);
-                }
-                else if (has_ll_modifer)
-                {
-                    int64_t x = va_arg(arg, long long int);
-                    memcpy(&args[pos], &x, sizeof(x));
-                    pos += sizeof(x);
-                }
-                else
-                {
-                    int16_t x = va_arg(arg, int);
-                    memcpy(&args[pos], &x, sizeof(x));
-                    pos += sizeof(x);
-                }
-                break;
-            }
-            case 'f':
-            {
-                double x = va_arg(arg, double);
-                memcpy(&args[pos], &x, sizeof(x));
-                pos += sizeof(x);
-                break;
-            }
-            case 'p':
-            {
-                void *x = va_arg(arg, void *);
-                memcpy(&args[pos], &x, sizeof(x));
-                pos += sizeof(x);
-                break;
-            }
-            case 's':
-            {
-                char *s = va_arg(arg, char *);
-                memcpy(&args[pos], s, strlen(s));
-                pos += strlen(s);
-            }
-            }
-        }
-        fmt++;
-    }
+    va_list arg;
+    va_start(arg, fmt);
+    read_format(fmt,arg,&args[0],&pos);
     va_end(arg);
 
     uint8_t _data[MAX_DATA_SIZE] = {0};
-    _data[0] = mod_id & 0xFF00;   //Module ID
-    _data[1] = mod_id & 0x00FF;   //Module ID
+    _data[0] = modid & 0xFF00;   //Module ID
+    _data[1] = modid & 0x00FF;   //Module ID
     _data[2] = __line__ & 0xFF00; //line nr
     _data[3] = __line__ & 0x00FF; //line nr
     if (pos != 0)                 // if no arguments no point of copying the args array
