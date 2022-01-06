@@ -23,13 +23,8 @@
 
 #include "modules_bin_list.h"
 
-#define MAX_ARG_COUNT 8
-#define ARG_BUFFER_SIZE (MAX_ARG_COUNT * 8)
-#define MAX_DATA_SIZE (ARG_BUFFER_SIZE + 4)
-#define MAX_LOG_PACKET_SIZE (MAX_DATA_SIZE + 2)
-
 static uint16_t m_log_level;
-static uint16_t m_buffer[512];
+static uint8_t m_buffer[512];
 
 static int (*mf_log_put)(const char *, int);
 static uint32_t (*mf_log_time)(void);
@@ -53,31 +48,63 @@ void __logger(uint16_t severity, uint16_t modid, uint16_t __line__, const char *
         return;
     }
 
-    uint8_t args[ARG_BUFFER_SIZE] = {0};
     uint32_t pos = 0;
+    uint32_t len = (numargs * 32) / 8; // Need argument size in bytes
+    uint32_t max_len = len + 4 + 2;
 
-    va_list arg;
-    va_start(arg, fmt);
-    read_format(fmt,arg,&args[0],&pos);
-    va_end(arg);
+    va_list args;
+    va_start(args, fmt);
 
-    uint8_t data[MAX_DATA_SIZE] = {0};
-    data[0] = modid & 0xFF00;   //Module ID
-    data[1] = modid & 0x00FF;   //Module ID
-    data[2] = __line__ & 0xFF00; //line nr
-    data[3] = __line__ & 0x00FF; //line nr
-    if (pos != 0)                // if no arguments no point of copying the args array
-    {
-        memcpy(&data[4], &args[0], pos);
-    }
-    uint8_t total_size = 4 + pos;
-    uint8_t log_packet[MAX_LOG_PACKET_SIZE] = {0};
-    int status = hdlc_encode(log_packet, 2 + total_size, data, total_size);
     log_mutex_acquire();
-    if (status != -1)
+    //start HDLC formating
+    m_buffer[pos++] = HDLC_START_FLAG;
+
+    uint8_t *current = &modid;
+    for (int i = 1; i >= 0; i--)
     {
-        mf_log_put(&log_packet[0], 2 + total_size);
+        //*(current + i)
+        if ((*(current + i) == HDLC_CONTROL_ESCAPE) || (*(current + i) == HDLC_START_FLAG) || (*(current + i) == HDLC_STOP_FLAG))
+        {
+            m_buffer[pos++] = HDLC_CONTROL_ESCAPE;
+            *(current + i) ^= 0x20;
+        }
+        m_buffer[pos++] = *(current + i);
     }
+    current = &__line__;
+    for (int i = 1; i >= 0; i--)
+    {
+        //*(current + i)
+        if ((*(current + i) == HDLC_CONTROL_ESCAPE) || (*(current + i) == HDLC_START_FLAG) || (*(current + i) == HDLC_STOP_FLAG))
+        {
+            m_buffer[pos++] = HDLC_CONTROL_ESCAPE;
+            *(current + i) ^= 0x20;
+        }
+        m_buffer[pos++] = *(current + i);
+    }
+
+    if (numargs != 0)
+    {
+        uint32_t arg = 0;
+        for (int i = 0; i < numargs; i++)
+        {
+            arg = va_arg(args, int);
+            uint8_t *p = &arg;
+            for (int k = 0; k < 4; k++)
+            {
+                if ((*(p + k) == HDLC_CONTROL_ESCAPE) || (*(p + k) == HDLC_START_FLAG) || (*(p + k) == HDLC_STOP_FLAG))
+                {
+                    m_buffer[pos++] = HDLC_CONTROL_ESCAPE;
+                    *(p + k) ^= 0x20;
+                }
+                m_buffer[pos++] = *(p + k);
+            }
+        }
+    }
+
+    m_buffer[pos++] = HDLC_STOP_FLAG;
+
+    mf_log_put(&m_buffer[0], max_len);
+
     log_mutex_release();
 }
 
@@ -89,39 +116,78 @@ void __loggerb(uint16_t severity, uint16_t modid, uint16_t __line__,
         return;
     }
 
-    uint8_t args[ARG_BUFFER_SIZE] = {0};
-    uint8_t pos = 0;
+    uint32_t pos = 0;
+    uint32_t len_arg = (numargs * 32) / 8; // Need argument size in bytes
+    uint32_t max_len = len_arg + len + 4 + 2;
 
-    va_list arg;
-    va_start(arg, fmt);
-    read_format(fmt,arg,&args[0],&pos);
-    va_end(arg);
+    va_list args;
+    va_start(args, fmt);
+    log_mutex_acquire();
+    //start HDLC formating
+    m_buffer[pos++] = HDLC_START_FLAG;
 
-    uint8_t _data[MAX_DATA_SIZE] = {0};
-    _data[0] = modid & 0xFF00;   //Module ID
-    _data[1] = modid & 0x00FF;   //Module ID
-    _data[2] = __line__ & 0xFF00; //line nr
-    _data[3] = __line__ & 0x00FF; //line nr
-    if (pos != 0)                 // if no arguments no point of copying the args array
+    uint8_t *current = &modid;
+    for (int i = 1; i >= 0; i--)
     {
-        memcpy(&_data[4], &args[0], pos);
+        //*(current + i)
+        if ((*(current + i) == HDLC_CONTROL_ESCAPE) || (*(current + i) == HDLC_START_FLAG) || (*(current + i) == HDLC_STOP_FLAG))
+        {
+            m_buffer[pos++] = HDLC_CONTROL_ESCAPE;
+            *(current + i) ^= 0x20;
+        }
+        m_buffer[pos++] = *(current + i);
     }
+    current = &__line__;
+    for (int i = 1; i >= 0; i--)
+    {
+        //*(current + i)
+        if ((*(current + i) == HDLC_CONTROL_ESCAPE) || (*(current + i) == HDLC_START_FLAG) || (*(current + i) == HDLC_STOP_FLAG))
+        {
+            m_buffer[pos++] = HDLC_CONTROL_ESCAPE;
+            *(current + i) ^= 0x20;
+        }
+        m_buffer[pos++] = *(current + i);
+    }
+
+    if (numargs != 0)
+    {
+        uint32_t arg = 0;
+        for (int i = 0; i < numargs; i++)
+        {
+            arg = va_arg(args, int);
+            uint8_t *p = &arg;
+            for (int k = 0; k < 4; k++)
+            {
+                if ((*(p + k) == HDLC_CONTROL_ESCAPE) || (*(p + k) == HDLC_START_FLAG) || (*(p + k) == HDLC_STOP_FLAG))
+                {
+                    m_buffer[pos++] = HDLC_CONTROL_ESCAPE;
+                    *(p + k) ^= 0x20;
+                }
+                m_buffer[pos++] = *(p + k);
+            }
+        }
+    }
+
     if (len != 0)
     {
-        //Needs to be changed. Limits buffer size quite a lot since you cant allocate 512bytes of stack everytime.
-        memcpy(&_data[4+pos], &data[0], len);
-        pos += len;
+        uint8_t *ptr = NULL;
+        for (int i = 0; i < len; i++)
+        {
+            ptr = (uint8_t *)data;
+            if ((*(ptr + i) == HDLC_CONTROL_ESCAPE) || (*(ptr + i) == HDLC_START_FLAG) || (*(ptr + i) == HDLC_STOP_FLAG))
+            {
+                m_buffer[pos++] = HDLC_CONTROL_ESCAPE;
+                *(ptr + i) ^= 0x20;
+            }
+            m_buffer[pos++] = *(ptr + i);
+        }
     }
-    uint8_t total_size = 4 + pos;
-    uint8_t log_packet[MAX_LOG_PACKET_SIZE] = {0};
-    int status = hdlc_encode(log_packet, 2 + total_size, _data, total_size);
-    log_mutex_acquire();
-    if (status != -1)
-    {
-        mf_log_put(log_packet, 2 + total_size);
-    }
+
+    m_buffer[pos++] = HDLC_STOP_FLAG;
+
+    mf_log_put(&m_buffer[0], max_len);
+
     log_mutex_release();
-    
 }
 
 static void log_mutex_acquire(void)

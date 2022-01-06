@@ -23,16 +23,14 @@
 #define __LINE_STRINGIZE(x) __LINE_STRINGIZE2(x)
 #define __LINE_STRINGIZE2(x) #x
 #define __LINE_STRING__ __LINE_STRINGIZE(__LINE__)
-
-#define NUMARGS(...)  (sizeof((int[]){0,__VA_ARGS__})/sizeof(int))
-#define test_print(len, fmt, ...) test_logger(len, fmt, NUMARGS(__VA_ARGS__), __VA_ARGS__)
+#define NUMARGS(...) (sizeof((int[]){__VA_ARGS__}) / sizeof(int))
 
 #if defined(__LOG_LEVEL__) && __LOG_LEVEL__!=0
 	#define logger(severity, str, args...)				({\
 		if( (severity) & __LOG_LEVEL__){ \
-			STATIC_CONST uint16_t moduulIDROM PROGMEM = _MODID_; \
+			STATIC_CONST unsigned short moduulROM PROGMEM = __MODUUL__;	\
 			STATIC_CONST char strROM[] PROGMEM = str;	\
-			__logger( severity, moduulIDROM, __LINE__, strROM , NUMARGS(args), ##args ); 	\
+			__logger( severity, moduulROM, __LINE__, strROM , NUMARGS(args), ##args ); 	\
 		}	\
 	})
 
@@ -45,33 +43,33 @@
 
 	#define loggerb(severity, str, data, len, args...)	({	\
 		if( (severity) & __LOG_LEVEL__){\
-			STATIC_CONST uint16_t moduulIDROM PROGMEM = _MODID_;	\
+			STATIC_CONST unsigned short moduulROM PROGMEM = __MODUUL__;	\
 			STATIC_CONST char strROM[] PROGMEM = str;	\
-			__loggerb( severity, moduulIDROM, __LINE__, strROM, data, len , NUMARGS(args), ##args  );	\
+			__loggerb( severity, moduulROM, __LINE__, strROM, data, len , NUMARGS(args), ##args  );	\
 		}	\
 	})
 
 	#define loggerb2(severity, str1, data1, len1, str2, data2, len2 , args...  )	({	\
 		if( (severity) & __LOG_LEVEL__){\
-			STATIC_CONST uint16_t moduulIDROM PROGMEM = _MODID_;	\
+			STATIC_CONST unsigned short moduulROM PROGMEM = __MODUUL__;	\
 			STATIC_CONST char str1ROM[] PROGMEM = str1;	\
 			STATIC_CONST char str2ROM[] PROGMEM = str2;	\
-			__loggerb2( severity, moduulIDROM, __LINE__, str1ROM, data1, len1, str2ROM, data2, len2, NUMARGS(args), ##args  );	\
+			__loggerb2( severity, moduulROM, __LINE__, str1ROM, data1, len1, str2ROM, data2, len2, ##args  );	\
 		}	\
 	})
 
 	#define loggerd(severity, def, args...)				({	\
 		if( (severity) & __LOG_LEVEL__){	\
-			STATIC_CONST uint16_t moduulIDROM PROGMEM = _MODID_;\
-			logger##def( severity, moduulIDROM, __LINE__ , NUMARGS(args), ##args );	\
+			STATIC_CONST unsigned short moduulROM PROGMEM = __MODUUL__;	\
+			logger##def( severity, moduulROM, __LINE__ , ##args );	\
 		}	\
 	})
 
 	#define loggerds(severity, def, str, args...)				({	\
 		if( (severity) & __LOG_LEVEL__){	\
-			STATIC_CONST uint16_t moduulIDROM PROGMEM = _MODID_;	\
+			STATIC_CONST unsigned short moduulROM PROGMEM = __MODUUL__;	\
 			STATIC_CONST char strROM[] PROGMEM = str;	\
-			logger##def( severity, _MODID_ , __LINE__ , strROM, NUMARGS(args), ##args );	\
+			logger##def( severity, moduulROM, __LINE__ , strROM, ##args );	\
 		}	\
 	})
 #else
