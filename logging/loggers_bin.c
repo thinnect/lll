@@ -59,7 +59,7 @@ void __logger(uint16_t severity, uint16_t modid, uint16_t __line__, const char *
     //start HDLC formating
     m_buffer[pos++] = HDLC_START_FLAG;
 
-    uint8_t *current = &modid;
+    uint8_t *current = (uint8_t*)&modid;
     for (int i = 1; i >= 0; i--)
     {
         //*(current + i)
@@ -70,7 +70,7 @@ void __logger(uint16_t severity, uint16_t modid, uint16_t __line__, const char *
         }
         m_buffer[pos++] = *(current + i);
     }
-    current = &__line__;
+    current = (uint8_t*)&__line__;
     for (int i = 1; i >= 0; i--)
     {
         //*(current + i)
@@ -88,7 +88,7 @@ void __logger(uint16_t severity, uint16_t modid, uint16_t __line__, const char *
         for (int i = 0; i < numargs; i++)
         {
             arg = va_arg(args, int);
-            uint8_t *p = &arg;
+            uint8_t *p = (uint8_t*)&arg;
             for (int k = 0; k < 4; k++)
             {
                 if ((*(p + k) == HDLC_CONTROL_ESCAPE) || (*(p + k) == HDLC_START_FLAG) || (*(p + k) == HDLC_STOP_FLAG))
@@ -103,7 +103,7 @@ void __logger(uint16_t severity, uint16_t modid, uint16_t __line__, const char *
 
     m_buffer[pos++] = HDLC_STOP_FLAG;
 
-    mf_log_put(&m_buffer[0], max_len);
+    mf_log_put((const char*)&m_buffer[0], max_len);
 
     log_mutex_release();
 }
@@ -126,7 +126,7 @@ void __loggerb(uint16_t severity, uint16_t modid, uint16_t __line__,
     //start HDLC formating
     m_buffer[pos++] = HDLC_START_FLAG;
 
-    uint8_t *current = &modid;
+    uint8_t *current = (uint8_t*)&modid;
     for (int i = 1; i >= 0; i--)
     {
         //*(current + i)
@@ -137,7 +137,7 @@ void __loggerb(uint16_t severity, uint16_t modid, uint16_t __line__,
         }
         m_buffer[pos++] = *(current + i);
     }
-    current = &__line__;
+    current = (uint8_t*)&__line__;
     for (int i = 1; i >= 0; i--)
     {
         //*(current + i)
@@ -155,7 +155,7 @@ void __loggerb(uint16_t severity, uint16_t modid, uint16_t __line__,
         for (int i = 0; i < numargs; i++)
         {
             arg = va_arg(args, int);
-            uint8_t *p = &arg;
+            uint8_t *p = (uint8_t*)&arg;
             for (int k = 0; k < 4; k++)
             {
                 if ((*(p + k) == HDLC_CONTROL_ESCAPE) || (*(p + k) == HDLC_START_FLAG) || (*(p + k) == HDLC_STOP_FLAG))
@@ -185,7 +185,7 @@ void __loggerb(uint16_t severity, uint16_t modid, uint16_t __line__,
 
     m_buffer[pos++] = HDLC_STOP_FLAG;
 
-    mf_log_put(&m_buffer[0], max_len);
+    mf_log_put((const char*)&m_buffer[0], max_len);
 
     log_mutex_release();
 }

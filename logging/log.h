@@ -69,7 +69,7 @@
 		if( (severity) & __LOG_LEVEL__){	\
 			STATIC_CONST unsigned short moduulROM PROGMEM = __MODUUL__;	\
 			STATIC_CONST char strROM[] PROGMEM = str;	\
-			logger##def( severity, moduulROM, __LINE__ , strROM, ##args );	\
+			logger##def( severity, moduulROM, __LINE__ , strROM, NUMARGS(args), ##args );	\
 		}	\
 	})
 #else
