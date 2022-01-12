@@ -12,11 +12,6 @@
 	#define __MODUUL__ __FILE__
 #endif
 
-#ifndef __MODID__
-	#warning no __MOD_ID defined, using 0x1337
-	#define __MODID__ 0x1337
-#endif
-
 #ifndef TOSSIM
 	#define STATIC_CONST static const
 #else
